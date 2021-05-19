@@ -1,4 +1,6 @@
 ### useAPIRequest
+#### Demo https://codesandbox.io/s/useapirequest-287p6
+#### useAPIRequest.js
 ```js
 import { useEffect, useState, useRef } from "react";
 import produce from "immer";
