@@ -52,3 +52,50 @@ const useAPIRequest = (request, initialData = null, deps = []) => {
 
 export default useAPIRequest; 
 ```
+### usePrefetch
+#### Demo: https://codesandbox.io/s/useprefetch-qixiu?file=/src/usePrefetch.js
+#### usePrefetch.js
+```js
+import { useEffect, useRef, useCallback } from "react";
+
+export const PREFETCH_DELAY = 500;
+
+const usePrefetch = (
+  requestFn,
+  preFetchCondition = true,
+  delay = PREFETCH_DELAY
+) => {
+  const timeoutID = useRef(null);
+  // We must store this in a ref so the handler inside setTimeout can "see" the current value.
+  const prefetchConditionRef = useRef(preFetchCondition);
+  // Update the ref when the values change.
+  useEffect(() => {
+    prefetchConditionRef.current = preFetchCondition;
+  }, [preFetchCondition]);
+
+  const makeRequest = () => {
+    timeoutID.current = window.setTimeout(() => {
+      if (prefetchConditionRef.current && requestFn) {
+        requestFn();
+      }
+    }, delay);
+  };
+  const cancelRequest = useCallback(() => {
+    if (timeoutID.current) {
+      window.clearTimeout(timeoutID.current);
+    }
+  }, []);
+
+  const handlers = {
+    onMouseEnter: makeRequest,
+    onFocus: makeRequest,
+    onMouseLeave: cancelRequest,
+    onBlur: cancelRequest
+  };
+
+  return { makeRequest, cancelRequest, handlers };
+};
+
+export default usePrefetch;
+
+```
